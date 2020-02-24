@@ -1,9 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using MyLeasing.Web.Data.Entities;
 
 namespace MyLeasing.Web.Data
 {
-    public class DataContext : DbContext
+    public class DataContext : IdentityDbContext<User>
     {
         //Para crear la base de datos Y  manejarla
         public DataContext(DbContextOptions<DataContext> options) : base(options)
@@ -12,6 +13,7 @@ namespace MyLeasing.Web.Data
         }
 
 
+        public DbSet<Manager> Managers { get; set; }
 
         public DbSet<Owner> Owners { get; set; }
 
