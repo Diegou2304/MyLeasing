@@ -29,8 +29,8 @@ namespace MyLeasing.Web.Controllers
             return View(_dataContext.Owners
                 .Include(o => o.User)
                 .Include(o => o.Properties)
-                .Include (o => o.Contracts));
-        
+                .Include(o => o.Contracts));
+
         }
 
         // GET: Owners/Details/5
@@ -41,9 +41,15 @@ namespace MyLeasing.Web.Controllers
             {
                 return NotFound();
             }
-
+            // Buscame el primero donee el id sea el mismo al que me pasaron
             var owner = await _dataContext.Owners
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .Include(o => o.User)
+                .Include(o => o.Properties)
+                .ThenInclude(p => p.PropertyImages)
+                .Include(o => o.Contracts)
+                .ThenInclude(c => c.Lessee)
+                .ThenInclude(l => l.User)
+                .FirstOrDefaultAsync(o => o.Id == id);
             if (owner == null)
             {
                 return NotFound();
