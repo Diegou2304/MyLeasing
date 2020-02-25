@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
+
+//Boostrap Buttons
 namespace MyLeasing.Web.Data.Entities
 {
     public class Owner
