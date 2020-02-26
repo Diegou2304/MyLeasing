@@ -64,7 +64,7 @@
 </div>
 <div>
     <a asp-action="Edit" class="btn btn-warning" asp-route-id="@Model.Id">Edit</a> |
-    <a asp-action="AddProperty" class="btn btn-primary" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="AddProperty" class="btn btn-primary" asp-route-id="@Model.Id">AddProperty</a> |
     <a asp-action="Index" class="btn btn-success">Back to List</a>
 </div>
 
@@ -93,6 +93,15 @@ else
                 <th>
                     @Html.DisplayNameFor(model => model.Properties.FirstOrDefault().Rooms)
                 </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Properties.FirstOrDefault().IsAvailable)
+                </th>
+                <th>
+                  Images
+                </th>
+                <th>
+                   Contracts
+                </th>
 
                 <th></th>
             </tr>
@@ -100,29 +109,38 @@ else
         <tbody>
             @foreach (var item in Model.Properties)
             {
-                <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Neighborhood)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Address)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Price)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.SquareMeters)
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Neighborhood)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Address)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Price)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SquareMeters)
 
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Rooms)
-                    </td>
-                    <td>
-                        <a asp-action="EditProperty" asp-route-id="@item.Id" class=" btn btn-warning ">Edit</a> |
-                        <a asp-action="DetailsProperty" asp-route-id="@item.Id" class=" btn btn-info ">Details</a> |
-                        <a asp-action="DeleteProperty" asp-route-id="@item.Id" class=" btn btn-danger ">Delete</a>
-                    </td>
-                </tr>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Rooms)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.IsAvailable)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PropertyImages.Count)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Contracts.Count)
+                </td>
+                <td>
+                    <a asp-action="EditProperty" asp-route-id="@item.Id" class=" btn btn-warning ">Edit</a> |
+                    <a asp-action="DetailsProperty" asp-route-id="@item.Id" class=" btn btn-info ">Details</a> |
+                    <a asp-action="DeleteProperty" asp-route-id="@item.Id" class=" btn btn-danger ">Delete</a>
+                </td>
+            </tr>
             }
         </tbody>
     </table>
