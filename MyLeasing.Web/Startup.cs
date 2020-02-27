@@ -61,6 +61,9 @@ namespace MyLeasing.Web
             //Lo inyecta cada vez que lo necesita, y crea un nuevo objecto
             //Singleton la primer vez que se llame lo llama en memoria y lo manda, pero no se destruye.
             services.AddScoped<IUserHelper, UserHelper>();
+            services.AddScoped<ICombosHelper, CombosHelper>();
+            services.AddScoped<IConverterHelper, ConverterHelper>();
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 
