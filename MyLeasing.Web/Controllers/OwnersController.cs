@@ -19,7 +19,6 @@ namespace MyLeasing.Web.Controllers
         private readonly DataContext _dataContext;
         private readonly IUserHelper _userHelper;
         private readonly ICombosHelper _combosHelper;
-
         private readonly IConverterHelper _converterHelper; 
 
         public OwnersController(DataContext dataContext,
@@ -257,7 +256,14 @@ namespace MyLeasing.Web.Controllers
 
             if (ModelState.IsValid)
             {
-                var property = _converterHelper.ToProperty(model, true);
+                //Mandamos true or false dependiendo si es nueva o no
+                var property = await _converterHelper.ToPropertyAsync(model, true);
+
+                _dataContext.Properties.Add(property);
+                await _dataContext.SaveChangesAsync();
+
+                //Dtalles del propietario
+                return RedirectToAction($"Details/{model.OwnerId}");
 
             }
 
