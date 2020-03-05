@@ -19,18 +19,20 @@ namespace MyLeasing.Web.Controllers
         private readonly DataContext _dataContext;
         private readonly IUserHelper _userHelper;
         private readonly ICombosHelper _combosHelper;
-        private readonly IConverterHelper _converterHelper; 
+        private readonly IConverterHelper _converterHelper;
+        private readonly IImageHelper _imageHelper;
 
         public OwnersController(DataContext dataContext,
             IUserHelper userHelper,
             ICombosHelper combosHelper,
-            IConverterHelper converterHelper)
+            IConverterHelper converterHelper,
+            IImageHelper imageHelper)
         {
             _dataContext = dataContext;
             _userHelper = userHelper;
             _combosHelper = combosHelper;
             _converterHelper = converterHelper;
-
+            _imageHelper = imageHelper;
         }
 
         // GET: Owners
@@ -268,11 +270,158 @@ namespace MyLeasing.Web.Controllers
             }
 
             return View(model);
+        }
+        public async Task<IActionResult> EditProperty(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+
+            }
+
+            //Busca por la clave primaria, con limitantes
+            //FindAync para datos sin relaciones
+            var property = await _dataContext.Properties
+                .Include(p => p.Owner)
+                .Include(pt => pt.PropertyType)
+                .FirstOrDefaultAsync(p => p.Id == id);
+
+            if (property == null)
+            {
+                return NotFound();
+
+            }
+
+            //Convertirlo a un property View Model, porque nos busca la propiedad, pero tenemos que mostrar con el modelo view model adaptado a su vista.
+
+            var model = _converterHelper.ToPropertyViewModel(property);
+            return View(model);
 
 
         }
+        [HttpPost]
+        public async Task<IActionResult> EditProperty(PropertyViewModel model)
+        {
+
+            if (ModelState.IsValid)
+            {
+                //Mandamos true or false dependiendo si es nueva o no, falso porque esta editando
+                var property = await _converterHelper.ToPropertyAsync(model, false);
+
+
+                _dataContext.Properties.Update(property);
+                await _dataContext.SaveChangesAsync();
+
+                //Dtalles del propietario
+                return RedirectToAction($"Details/{model.OwnerId}");
+
+            }
+
+            return View(model);
+        }
+
+        public async Task<IActionResult> DetailsProperty(int? id)
+        {
+
+            if (id == null)
+            {
+                return NotFound();
+
+            }
+
+            var property = await _dataContext.Properties
+                .Include(o => o.Owner)
+                .ThenInclude(o => o.User)
+                .Include(c => c.Contracts)
+                .ThenInclude(l => l.Lessee)
+                .ThenInclude(u => u.User)
+                .Include(pt => pt.PropertyType)
+                .Include(pi => pi.PropertyImages)
+                .FirstOrDefaultAsync(p => p.Id == id);
+
+            if (property == null)
+            {
+                return NotFound();
+            }
+            return View(property);
 
 
 
+
+        }
+        //Le mandamos el id
+        //Verifico el estado del modelo
+        //Busca la propiedad asignada a ese id
+        //Si la encuentra tenemos que asignar al property los campos del proerty view model
+        //Esto recupera los datos correspondientes de la imagen
+        public async Task<IActionResult> AddImage(int? id)
+        {
+
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var property = await _dataContext.Properties.FindAsync(id);
+
+            if (property == null)
+            {
+                return NotFound();
+            }
+
+
+            //Hacemos esto para la indicar y guardar en el model el id de la propiedad
+            var model = new PropertyImageViewModel
+            {
+                Id = property.Id,
+
+
+
+
+            };
+
+            return View(model);
+
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddImage(PropertyImageViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var path = string.Empty;
+
+                if (model.ImageFile != null)
+                {
+                    path = await _imageHelper.UploadImageAsync(model.ImageFile);
+
+                }
+                var propertyImage = new PropertyImage
+                {
+                    ImageUrl = path,
+                    Property = await _dataContext.Properties.FindAsync(model.Id)
+                };
+
+                _dataContext.PropertyImages.Add(propertyImage);
+
+                await _dataContext.SaveChangesAsync();
+
+                return RedirectToAction($"{nameof(DetailsProperty)}/{ model.Id}");
+            }
+            return NotFound();
+        }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
+

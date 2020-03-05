@@ -11,11 +11,15 @@ namespace MyLeasing.Web.Helpers
     public class ConverterHelper : IConverterHelper
     {
         private readonly DataContext _dataContext;
+        private readonly ICombosHelper _combosHelper;
 
         //Inyectamos porque necesitamos usar la db
-        public ConverterHelper(DataContext dataContext)
+        public ConverterHelper(
+            DataContext dataContext,
+            ICombosHelper combosHelper)
         {
             _dataContext = dataContext;
+            _combosHelper = combosHelper;
         }
 
 
@@ -47,6 +51,42 @@ namespace MyLeasing.Web.Helpers
             };
         }
 
+        //Aqui convertiremos
+        public PropertyViewModel ToPropertyViewModel(Property property)
+        {
+            //Tenemos que mandarle el owner y el property type
+            return new PropertyViewModel
+            {
+                Address = property.Address,
+                Contracts = property.Contracts,
+                HasParkingLot = property.HasParkingLot,
+                //Create diferente de 0, si no es nueva le ponemos el del modelo
+                Id = property.Id,
+                IsAvailable = property.IsAvailable,
+                Neighborhood = property.Neighborhood,
+                //Aqui tenemos problemas con el owner porque el property model no trae el owner.
+                //Aqui le pasamos la entidad
+                Owner = property.Owner,
+                Price = property.Price,
+                PropertyImages = property.PropertyImages,
+                PropertyType = property.PropertyType,
+                Remarks = property.Remarks,
+                Rooms = property.Rooms,
+                SquareMeters = property.SquareMeters,
+                Stratum = property.Stratum,
 
+                //Parte propia del view model
+
+                OwnerId = property.Owner.Id,
+                PropertyTypeId = property.PropertyType.Id,
+                PropertyTypes =  _combosHelper.GetComboPropertyTypes(),
+
+
+
+
+            };
+        }
     }
 }
+    
+
